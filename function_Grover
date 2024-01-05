@@ -1,0 +1,94 @@
+#
+#Teaching demo showing Grover search on n bits using Qiskit
+#
+
+def Grover(n):
+#Define an interactive function that searches for a user-specified bit string 
+#This string is represented by integer m in a space of bit strings represented by integer n
+    
+    import numpy as np
+    from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, transpile
+    from qiskit.providers.aer import QasmSimulator
+    from qiskit.visualization import plot_histogram
+    #bring in necessary packages for a Qiskit program
+
+    # Use Aer's qasm_simulator 
+    ### THIS MEANS THE PROGRAM IS NOT BEING RUN ON A REAL QUANTUM COMPUTER ###
+    simulator = QasmSimulator()
+
+    # Create a Quantum Circuit acting on the quantum 'q' register
+    qr = QuantumRegister(n, 'q')
+    cr = ClassicalRegister(n, 'c')
+    circuit = QuantumCircuit(qr, cr)
+
+#initialize input state as all 1s
+### Note, most tutorials initialize in the all zero state, for Grover, the all 1 state saves on uneccessary gates ###
+for i in range(0,n):
+        circuit.x(i)
+
+
+# Add a H gate on all qubits
+### This produces the state |--...-> state, an equal superposition of all bit strings 
+    for i in range(0,n):
+            circuit.h(i)
+            
+
+### Ask the user to specify the bit string m to be marked for search ###            
+
+#initialize the mark variable to enable the while loop to prompt the user for the bit string to search
+mark = -1
+
+#use while loop to prompt user for input and not move on until a valid input has been given
+while mark <= 0 or n <= mark:
+    #ask user for input
+    mark = int(input("Which bit 0<=m<=n would you like to mark? "))
+    if mark >= n:
+        #throw error if marked bit is larger than the database size n
+        print("Invalid entry, m can not be greater than n")
+        
+        mark = int(input("Which bit 0<=m<=n would you like to mark? "))
+    if mark <= 0:
+        #throw error if marked bit is negative (nonsensical)
+        print("Invalid entry, m must be positive")
+        #print(f"You have marked", mark)
+        
+        mark = int(input("Which bit 0<=m<=n would you like to mark? "))
+    else:
+        #once valid input is given, confirm marked bit
+        print(f"You have marked", mark)
+    
+### Now that we have established the marked bit, implement the search (diffusion) operator
+# Note Grover requires sqrt(n) calls to the search operator to maximize the probability of finding the marked state
+
+#Search operator applied sqrt(n) times
+for j in range(0, np.floor(np.sqrt(n))):
+
+    for i in range(0,n-1):
+            circuit.h(i)
+                        
+    Toffoli(n)
+
+    for i in range(0,n-1):
+            circuit.h(i)
+            
+
+# Map the quantum measurement to the classical bits
+    circuit.measure(qr, cr)
+
+# compile the circuit down to low-level QASM instructions
+# supported by the backend (not needed for simple circuits)
+    compiled_circuit = transpile(circuit, simulator)
+
+# Execute the circuit on the qasm simulator
+    job = simulator.run(compiled_circuit, shots=1)
+
+# Grab results from the job
+    result = job.result()
+
+
+# Returns counts
+    counts = result.get_counts(compiled_circuit)
+    print(counts)
+    
+# Draw the circuit
+#circuit.draw()
