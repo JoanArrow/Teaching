@@ -1,7 +1,7 @@
 
-"""
-Generating a Qrandom number between 0 and n-1
-"""
+###
+#Generating a Qrandom number between 0 and n-1 in Qiskit
+###
 
 def Qrand(n):
 

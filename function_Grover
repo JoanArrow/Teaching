@@ -21,18 +21,6 @@ def Grover(n):
     cr = ClassicalRegister(n, 'c')
     circuit = QuantumCircuit(qr, cr)
 
-#initialize input state as all 1s
-### Note, most tutorials initialize in the all zero state, for Grover, the all 1 state saves on uneccessary gates ###
-for i in range(0,n):
-        circuit.x(i)
-
-
-# Add a H gate on all qubits
-### This produces the state |--...-> state, an equal superposition of all bit strings 
-    for i in range(0,n):
-            circuit.h(i)
-            
-
 ### Ask the user to specify the bit string m to be marked for search ###            
 
 #initialize the mark variable to enable the while loop to prompt the user for the bit string to search
@@ -56,16 +44,49 @@ while mark <= 0 or n <= mark:
     else:
         #once valid input is given, confirm marked bit
         print(f"You have marked", mark)
-    
+###
+# TO DO
+# Convert M -> binary b -> X^otimes b -> circuit
+b = bin(mark)[2:]
+
+def Marked_Bit_Flip(b):
+    for i in len(b):
+        if b[i] == '0'
+            circuit.x(i)
+
 ### Now that we have established the marked bit, implement the search (diffusion) operator
 # Note Grover requires sqrt(n) calls to the search operator to maximize the probability of finding the marked state
+
+#initialize input state as all 1s
+### Note, most tutorials initialize in the all zero state, for Grover, the all 1 state saves on uneccessary gates ###
+for i in range(0,n):
+        circuit.x(i)
+
+
+# Add a H gate on all qubits
+### This produces the state |--...-> state, an equal superposition of all bit strings 
+    for i in range(0,n):
+            circuit.h(i)
 
 #Search operator applied sqrt(n) times
 for j in range(0, np.floor(np.sqrt(n))):
 
+    #reflext over marked state
+    Marked_Bit_Flip(b)
+    #reflect all one
+    circuit.h(n)
+    
+    circuit.x(n)
+
+    circuit.h(n)
+    #complete reflect over marked state
+    Marked_Bit_Flip(b)
+
+#reflect over starting state
     for i in range(0,n-1):
             circuit.h(i)
-                        
+
+    #this is not the right syntax for toffoli targeted on n
     Toffoli(n)
 
     for i in range(0,n-1):
