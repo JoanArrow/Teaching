@@ -76,8 +76,11 @@ for j in range(0, np.floor(np.sqrt(n))):
     #reflect all one
     circuit.h(n)
     
+    ### To Do
+    #make this x gate controlled on n-1 qubits
     circuit.x(n)
-
+    ###
+    
     circuit.h(n)
     #complete reflect over marked state
     Marked_Bit_Flip(b)
